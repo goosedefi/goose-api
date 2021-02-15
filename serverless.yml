@@ -1,0 +1,90 @@
+# Welcome to Serverless!
+#
+# This file is the main config file for your service.
+# It's very minimal at this point and uses default values.
+# You can always add more config options for more control.
+# We've included some commented out config examples here.
+# Just uncomment any of them to get that config option.
+#
+# For full config options, check the docs:
+#    docs.serverless.com
+#
+# Happy Coding!
+
+service: goose-api
+# app and org for use with dashboard.serverless.com
+#app: your-app-name
+#org: your-org-name
+
+# You can pin your service to only deploy with a specific Serverless version
+# Check out our docs for more details
+# frameworkVersion: "=X.X.X"
+
+plugins:
+  - serverless-webpack
+
+custom:
+  webpack:
+    webpackConfig: ./webpack.config.js
+    includeModules: true
+    packager: yarn
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: ap-northeast-1
+  stage: ${opt:stage, 'dev'}
+  profile: gooseFinance
+  logRetentionInDays: 30
+  environment:
+    Provider: "https://bsc-dataseed.binance.org/"
+    EggAddress: "0xF952Fc3ca7325Cc27D15885d37117676d25BfdA6"
+    BurnAddress: "0x000000000000000000000000000000000000dead"
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - lambda:*
+      Resource: arn:aws:lambda:${self:provider.region}:*:*
+#    - Effect: Allow
+#      Action:
+#        - dynamodb:*
+#      Resource: arn:aws:dynamodb:${self:provider.region}:*:*
+
+functions:
+  getTotalSupply:
+    handler: handler.getTotalSupply
+    events:
+      - http:
+          path: getTotalSupply
+          method: get
+          cors: true
+  getCirculatingSupply:
+    handler: handler.getCirculatingSupply
+    events:
+      - http:
+          path: getCirculatingSupply
+          method: get
+          cors: true
+
+# you can add CloudFormation resource templates here
+resources:
+  Resources:
+    GatewayResponseDefault4XX:
+      Type: 'AWS::ApiGateway::GatewayResponse'
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+        ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: 'ApiGatewayRestApi'
+    GatewayResponseDefault5XX:
+      Type: 'AWS::ApiGateway::GatewayResponse'
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+        ResponseType: DEFAULT_5XX
+        RestApiId:
+          Ref: 'ApiGatewayRestApi'
