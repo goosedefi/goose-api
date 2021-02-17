@@ -66,6 +66,13 @@ functions:
           path: getCirculatingSupply
           method: get
           cors: true
+  getTVL:
+    handler: getTVL.getTVL
+    events:
+      - http:
+          path: getTVL
+          method: get
+          cors: true
 
 # you can add CloudFormation resource templates here
 resources:

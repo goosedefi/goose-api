@@ -1,6 +1,6 @@
 import {buildResponse, failure} from "./response-lib";
 import Web3 from "web3";
-import eggABI from "./eggToken.json";
+import eggABI from "./abi/eggToken.json";
 import BigNumber from "bignumber.js";
 
 const web3 = new Web3(process.env.Provider);
